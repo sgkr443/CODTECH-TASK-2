@@ -1,0 +1,149 @@
+/* FINITE STATE MACHINE DESIGN CODE*/
+
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 08.07.2024 18:24:39
+// Design Name: 
+// Module Name: state_machines
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+module state_machines(
+    input clk,
+    input rst,
+    input inp,
+    output reg outp,
+    output reg [1:0] state
+);
+
+always @(posedge clk or posedge rst) begin
+    if (rst)
+        state <= 2'b00;
+    else begin
+        case (state)
+            2'b00: begin
+                if (inp) state <= 2'b01;
+                else state <= 2'b10;
+            end
+            2'b01: begin
+                if (inp) state <= 2'b11;
+                else state <= 2'b10;
+            end
+            2'b10: begin
+                if (inp) state <= 2'b01;
+                else state <= 2'b11;
+            end
+            2'b11: begin
+                if (inp) state <= 2'b01;
+                else state <= 2'b10;
+            end
+        endcase
+    end
+end
+
+always @(posedge clk or posedge rst) begin
+    if (rst)
+        outp <= 0;
+    else if (state == 2'b11)
+        outp <= 1;
+    else
+        outp <= 0;
+end
+
+endmodule
+
+
+/* FINITE STATE MACHINE TEST BENCH CODE*/
+
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 08.07.2024 18:44:05
+// Design Name: 
+// Module Name: stimuli
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module stimuli(
+
+    );
+endmodule
+`timescale 1ns / 1ps
+
+module state_machines_tb;
+
+    reg clk;
+    reg rst;
+    reg inp;
+    wire outp;
+    wire [1:0] state;
+
+    // Instantiate the FSM
+    state_machines uut (
+        .clk(clk),
+        .rst(rst),
+        .inp(inp),
+        .outp(outp),
+        .state(state)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  // 10 time units period
+    end
+
+    // Test sequence
+    initial begin
+        // Initialize
+        rst = 1;
+        inp = 0;
+        #10;
+        rst = 0;
+
+        // Test different inputs and observe the states
+        inp = 1; #10;
+        inp = 0; #10;
+        inp = 1; #10;
+        inp = 0; #10;
+        inp = 1; #10;
+        inp = 0; #10;
+        
+        // Let the FSM run for a few cycles
+        #100;
+        $stop;
+    end
+
+    // Monitor the output
+    initial begin
+        $monitor("At time %t, state = %b, outp = %b, inp = %b", $time, state, outp, inp);
+    end
+
+endmodule
+
